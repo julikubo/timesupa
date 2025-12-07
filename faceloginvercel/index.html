@@ -93,7 +93,7 @@
         const AUTO_PASSWORD = 'leandrok';
 
         // Inicializa Supabase
-        const supabase = supaBase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
         const video = document.getElementById('video');
         const msg = document.getElementById('msg');
