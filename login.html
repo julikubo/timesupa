@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeSupa - Login</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Estilos customizados -->
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <!-- Logo/Título -->
+                        <div class="text-center mb-4">
+                            <i class="bi bi-clock-history text-primary" style="font-size: 3rem;"></i>
+                            <h2 class="mt-2 text-primary">TimeSupa</h2>
+                            <p class="text-muted">Sistema de Controle de Ponto</p>
+                        </div>
+
+                        <!-- Alertas -->
+                        <div id="alertContainer"></div>
+
+                        <!-- Formulário de Login -->
+                        <form id="loginForm" style="display: block;">
+                            <div class="mb-3">
+                                <label for="loginEmail" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </label>
+                                <input type="email" class="form-control" id="loginEmail" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">
+                                    <i class="bi bi-lock"></i> Senha
+                                </label>
+                                <input type="password" class="form-control" id="loginPassword" required>
+                            </div>
+
+                            <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary btn-sm" id="loginBtn">
+                                    <i class="bi bi-box-arrow-in-right"></i> Entrar
+                                </button>
+                                <a href="facelogin/index.php" class="btn btn-outline-secondary btn-sm"
+                                    title="Login Facial">
+                                    <i class="bi bi-person-bounding-box"></i>
+                                </a>
+                            </div>
+
+                            <div class="text-center">
+                                <a href="#" id="showRegister" class="text-decoration-none">
+                                    Não tem conta? Cadastre-se
+                                </a>
+                                <br>
+                                <a href="#" id="showForgotPassword" class="text-decoration-none small">
+                                    Esqueceu a senha?
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Formulário de Registro -->
+                        <form id="registerForm" style="display: none;">
+                            <div class="mb-3">
+                                <label for="registerName" class="form-label">
+                                    <i class="bi bi-person"></i> Nome Completo
+                                </label>
+                                <input type="text" class="form-control" id="registerName" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="registerCompany" class="form-label">
+                                    <i class="bi bi-building"></i> Empresa (opcional)
+                                </label>
+                                <input type="text" class="form-control" id="registerCompany">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="registerEmail" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </label>
+                                <input type="email" class="form-control" id="registerEmail" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">
+                                    <i class="bi bi-lock"></i> Senha
+                                </label>
+                                <input type="password" class="form-control" id="registerPassword" required
+                                    minlength="6">
+                                <div class="form-text">Mínimo 6 caracteres</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="registerPasswordConfirm" class="form-label">
+                                    <i class="bi bi-lock-fill"></i> Confirmar Senha
+                                </label>
+                                <input type="password" class="form-control" id="registerPasswordConfirm" required>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-success" id="registerBtn">
+                                    <i class="bi bi-person-plus"></i> Cadastrar
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <a href="#" id="showLogin" class="text-decoration-none">
+                                    Já tem conta? Faça login
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Formulário de Recuperação de Senha -->
+                        <form id="forgotPasswordForm" style="display: none;">
+                            <div class="mb-3">
+                                <label for="forgotEmail" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </label>
+                                <input type="email" class="form-control" id="forgotEmail" required>
+                                <div class="form-text">Enviaremos um link para redefinir sua senha</div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-warning" id="forgotBtn">
+                                    <i class="bi bi-arrow-clockwise"></i> Recuperar Senha
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <a href="#" id="backToLogin" class="text-decoration-none">
+                                    Voltar ao login
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        TimeSupa v1.0 - Powered by Supabase
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Scripts do projeto -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Inicializar Supabase
+            try {
+                initSupabase();
+
+                // Diagnóstico: verificar conectividade com Supabase
+                try {
+                    const reachable = await checkSupabaseReachability();
+                    if (!reachable) {
+                        showAlert('Falha ao conectar ao Supabase. Verifique sua internet ou DNS.', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Erro ao verificar conectividade:', error);
+                    showAlert('Falha ao verificar conectividade com Supabase.', 'warning');
+                }
+            } catch (error) {
+                console.error('Erro ao inicializar Supabase:', error);
+                showAlert('Erro ao inicializar sistema. Verifique o console.', 'danger');
+            }
+
+            // Tentativa de login automático vindo do facelogin (tokens no hash)
+            try {
+                const autoOk = await tryAutoLoginFromHash();
+                if (autoOk) return; // sessão pronta, página será redirecionada
+            } catch (e) {
+                console.error('Erro no login automático via hash:', e);
+            }
+
+            // Verificar se já está logado
+            try {
+                const isLoggedIn = await authManager.checkAuth();
+                if (isLoggedIn) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                // Continuar exibindo a página de login mesmo se houver erro
+            }
+
+            // Event listeners para alternar formulários
+            document.getElementById('showRegister').addEventListener('click', function (e) {
+                e.preventDefault();
+                showForm('register');
+            });
+
+            document.getElementById('showLogin').addEventListener('click', function (e) {
+                e.preventDefault();
+                showForm('login');
+            });
+
+            document.getElementById('showForgotPassword').addEventListener('click', function (e) {
+                e.preventDefault();
+                showForm('forgot');
+            });
+
+            document.getElementById('backToLogin').addEventListener('click', function (e) {
+                e.preventDefault();
+                showForm('login');
+            });
+
+            // Event listeners para formulários
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('forgotPasswordForm').addEventListener('submit', handleForgotPassword);
+        });
+
+        // Alternar entre formulários
+        function showForm(formType) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPasswordForm').style.display = 'none';
+
+            document.getElementById(formType + 'Form').style.display = 'block';
+            clearAlerts();
+        }
+
+        // Tenta aplicar sessão do Supabase a partir de tokens no hash
+        async function tryAutoLoginFromHash() {
+            const hash = window.location.hash ? window.location.hash.substring(1) : '';
+            if (!hash) return false;
+
+            const params = new URLSearchParams(hash);
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+
+            if (accessToken && refreshToken) {
+                try {
+                    const { data, error } = await supabase.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    });
+                    if (error) {
+                        showAlert('Falha ao aplicar sessão automática: ' + error.message, 'danger');
+                        return false;
+                    }
+                    showAlert('Login automático realizado com sucesso!', 'success');
+                    // Limpar o hash para evitar reaplicar sessão
+                    window.location.hash = '';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                    return true;
+                } catch (err) {
+                    showAlert('Erro no login automático: ' + err.message, 'danger');
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Manipular login
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Entrando...';
+
+            try {
+                const result = await authManager.login(email, password);
+
+                if (result.success) {
+                    showAlert('Login realizado com sucesso!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showAlert(result.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro inesperado: ' + error.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Entrar';
+            }
+        }
+
+        // Manipular registro
+        async function handleRegister(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('registerName').value;
+            const company = document.getElementById('registerCompany').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            const btn = document.getElementById('registerBtn');
+
+            // Validar senhas
+            if (password !== passwordConfirm) {
+                showAlert('As senhas não coincidem', 'danger');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Cadastrando...';
+
+            try {
+                const result = await authManager.register(email, password, name, company);
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showAlert(result.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro inesperado: ' + error.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-person-plus"></i> Cadastrar';
+            }
+        }
+
+        // Manipular recuperação de senha
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('forgotEmail').value;
+            const btn = document.getElementById('forgotBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+
+            try {
+                const result = await authManager.resetPassword(email);
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    setTimeout(() => {
+                        showForm('login');
+                    }, 2000);
+                } else {
+                    showAlert(result.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro inesperado: ' + error.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Recuperar Senha';
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            clearAlerts();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.getElementById('alertContainer').appendChild(alertDiv);
+        }
+
+        // Limpar alertas
+        function clearAlerts() {
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>

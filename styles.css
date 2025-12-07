@@ -1,0 +1,454 @@
+/* TimeSupa - Estilos Customizados */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #6c99c6;
+    
+    --border-radius: 0.5rem;
+    --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+}
+
+/* Layout geral */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.bg-light {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-lg);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    overflow: visible;
+}
+
+.card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+/* Botões */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0.75rem 1.5rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color), #0056b3);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, var(--success-color), #146c43);
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, var(--danger-color), #b02a37);
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, var(--warning-color), #e0a800);
+    color: var(--dark-color);
+}
+
+.btn-info {
+    background: linear-gradient(45deg, var(--info-color), #0aa2c0);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Formulários */
+.form-control {
+    border-radius: var(--border-radius);
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.card .form-label,
+.card label,
+.card .input-group-text {
+    color: var(--dark-color);
+}
+
+/* Forçar texto branco nas seções do TimeSupa com fundo escuro */
+#timecardContent .card .form-label,
+#timecardContent .card label,
+#timecardContent .card .input-group-text,
+#timecardContent .card .card-header,
+#timecardContent .card .card-body { 
+    color: #fff !important;
+}
+
+#reportsContent .card .form-label,
+#reportsContent .card label,
+#reportsContent .card .input-group-text,
+#reportsContent .card .card-header,
+#reportsContent .card .card-body { 
+    color: #fff !important;
+}
+
+#settingsContent .card .form-label,
+#settingsContent .card label,
+#settingsContent .card .input-group-text,
+#settingsContent .card .card-header,
+#settingsContent .card .card-body { 
+    color: #fff !important;
+}
+
+#timecardContent .form-control::placeholder,
+#reportsContent .form-control::placeholder,
+#settingsContent .form-control::placeholder { 
+    color: rgba(255,255,255,0.8) !important;
+}
+
+/* Modal padrão com fundo claro e texto escuro */
+.modal-content {
+    background: #fff;
+    color: var(--dark-color);
+}
+
+.modal-header,
+.modal-footer {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--dark-color);
+}
+
+.modal-content .form-label,
+.modal-content label,
+.modal-content .input-group-text {
+    color: var(--dark-color);
+}
+
+.modal-content .form-control {
+    color: var(--dark-color);
+    background: #fff;
+    border-color: #e9ecef;
+}
+
+#profileModal .modal-header,
+#profileModal .modal-footer {
+    padding: 0.5rem 0.75rem;
+}
+
+#profileModal .modal-body {
+    padding: 0.75rem;
+}
+
+#profileModal .form-control {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+#profileModal .form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+#profileModal .mb-3 {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Alertas */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    box-shadow: var(--box-shadow);
+}
+
+/* Navbar */
+.navbar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--box-shadow);
+    position: relative;
+    z-index: 2000;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Tabelas */
+.table {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+}
+
+.table thead th {
+    background: linear-gradient(45deg, var(--primary-color), #0056b3);
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* Cards de estatísticas */
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-lg);
+}
+
+.stat-card.success {
+    border-left-color: var(--success-color);
+}
+
+.stat-card.warning {
+    border-left-color: var(--warning-color);
+}
+
+.stat-card.danger {
+    border-left-color: var(--danger-color);
+}
+
+.stat-card.info {
+    border-left-color: var(--info-color);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.stat-label {
+    color: var(--secondary-color);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+}
+
+/* Ícones */
+.icon-lg {
+    font-size: 2rem;
+}
+
+.icon-xl {
+    font-size: 3rem;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* Estados de loading */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+}
+
+/* Utilitários */
+.text-gradient {
+    background: linear-gradient(45deg, var(--primary-color), #0056b3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.border-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, var(--primary-color), #0056b3) 1;
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* Dark mode (opcional) */
+@media (prefers-color-scheme: dark) {
+    .card {
+        background: rgba(33, 37, 41, 0.95);
+        color: white;
+    }
+    
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+    }
+}
+
+/* Texto branco em fundos escuros */
+.bg-dark,
+.navbar-dark,
+.card.bg-dark,
+.modal-content.bg-dark {
+    color: #fff !important;
+}
+
+.bg-dark .form-label,
+.navbar-dark .form-label,
+.card.bg-dark .form-label,
+.bg-dark label {
+    color: #fff !important;
+}
+
+.bg-dark .form-control,
+.navbar-dark .form-control,
+.card.bg-dark .form-control,
+.modal-content.bg-dark .form-control {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.bg-dark .form-control::placeholder,
+.navbar-dark .form-control::placeholder,
+.card.bg-dark .form-control::placeholder,
+.modal-content.bg-dark .form-control::placeholder {
+        color: #fff;
+    color: rgba(255, 255, 255, 0.7);
+}
+.dropdown-menu {
+    z-index: 2100;
+}

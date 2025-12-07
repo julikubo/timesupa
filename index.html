@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeSupa - Dashboard</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Estilos customizados -->
+    <link href="styles.css" rel="stylesheet">
+
+    <!-- Scripts do projeto -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/timecard.js"></script>
+</head>
+
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand text-primary" href="#">
+                <i class="bi bi-clock-history"></i> TimeSupa
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="dashboardTab">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="timecardTab">
+                            <i class="bi bi-clock"></i> Ponto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="reportsTab">
+                            <i class="bi bi-graph-up"></i> Relatórios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="settingsTab">
+                            <i class="bi bi-gear"></i> Configurações
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> <span id="userName">Usuário</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="profileLink">
+                                    <i class="bi bi-person"></i> Perfil
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" id="logoutLink">
+                                    <i class="bi bi-box-arrow-right"></i> Sair
+                                </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mt-4">
+        <!-- Alertas -->
+        <div id="alertContainer"></div>
+
+        <!-- Dashboard -->
+        <div id="dashboardContent" class="tab-content">
+            <!-- Status do Ponto Atual -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">Status Atual</h3>
+                            <div id="currentStatus" class="mt-3">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="me-4">
+                                        <div id="currentTime" class="display-4 text-primary">--:--:--</div>
+                                        <div class="text-muted">Hora Atual</div>
+                                    </div>
+                                    <div class="vr mx-4"></div>
+                                    <div class="ms-4">
+                                        <div id="workStatus" class="h4 text-secondary">Fora do Expediente</div>
+                                        <div id="workTime" class="text-muted">--:--</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <button id="clockInBtn" class="btn btn-success btn-lg me-2">
+                                        <i class="bi bi-play-circle"></i> Entrada
+                                    </button>
+                                    <button id="clockOutBtn" class="btn btn-danger btn-lg" disabled>
+                                        <i class="bi bi-stop-circle"></i> Saída
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas do Dia -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card success">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-value" id="todayHours">0:00</div>
+                                <div class="stat-label">Horas Hoje</div>
+                            </div>
+                            <i class="bi bi-clock icon-lg text-success"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card warning">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-value" id="weekHours">0:00</div>
+                                <div class="stat-label">Horas Semana</div>
+                            </div>
+                            <i class="bi bi-calendar-week icon-lg text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-value" id="monthHours">0:00</div>
+                                <div class="stat-label">Horas Mês</div>
+                            </div>
+                            <i class="bi bi-calendar-month icon-lg text-info"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card danger">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-value" id="extraHours">0:00</div>
+                                <div class="stat-label">Horas Extras</div>
+                            </div>
+                            <i class="bi bi-plus-circle icon-lg text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registros Recentes -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Registros Recentes</h5>
+                            <button class="btn btn-outline-primary btn-sm" id="refreshRecords">
+                                <i class="bi bi-arrow-clockwise"></i> Atualizar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Entrada</th>
+                                            <th>Saída</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Observação</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentRecords">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">
+                                                <i class="bi bi-hourglass-split"></i> Carregando registros...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="profileModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Meu Perfil</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="profileForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="pfFullName" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Empresa</label>
+                                <input type="text" class="form-control" id="pfCompanyName" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="pfEmail">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nova Senha</label>
+                                <input type="password" class="form-control" id="pfNewPassword" placeholder="Mínimo 6 caracteres">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirmar Nova Senha</label>
+                                <input type="password" class="form-control" id="pfConfirmPassword">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="saveProfileBtn">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="timecardContent" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Registro de Horas</h5>
+                </div>
+                <div class="card-body">
+                    <form id="timecardForm">
+                        <div class="mb-3">
+                            <label class="form-label">Data</label>
+                            <input type="date" class="form-control" id="tcDate" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Horário de Entrada</label>
+                                <input type="time" class="form-control" id="tcIn" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Horário de Saída</label>
+                                <input type="time" class="form-control" id="tcOut" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="tcSunday">
+                                <label class="form-check-label" for="tcSunday">Feriado</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observação</label>
+                            <textarea class="form-control" id="tcNotes" rows="2"></textarea>
+                        </div>
+                        <div class="alert alert-info" id="tcPreview" style="display:none;"></div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" id="tcPreviewBtn">Prévia</button>
+                            <button type="submit" class="btn btn-success" id="tcSaveBtn">Salvar Registro</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="clockOutModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Observação da Saída</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label" for="clockOutNotes">Observação (opcional)</label>
+                            <textarea class="form-control" id="clockOutNotes" rows="3"
+                                placeholder="Digite uma observação, se necessário"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="confirmClockOutBtn">Confirmar Saída</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reportsContent" class="tab-content" style="display: none;">
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Relatório Mensal</h5>
+                </div>
+                <div class="card-body">
+                    <form id="reportFilters" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Mês</label>
+                            <select class="form-select" id="repMonth"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ano</label>
+                            <select class="form-select" id="repYear"></select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
+                            <button type="button" class="btn btn-primary" id="repFilterBtn">Filtrar</button>
+                            <button type="button" class="btn btn-success" id="repPrintBtn">Imprimir</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered" id="repTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Entrada</th>
+                                    <th>Saída</th>
+                                    <th>Horas Normais</th>
+                                    <th>Horas Extras</th>
+                                    <th>Valor Normal</th>
+                                    <th>Valor Extra</th>
+                                    <th>Total do Dia</th>
+                                    <th>Observação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repBody"></tbody>
+                            <tfoot class="table-dark">
+                                <tr>
+                                    <th colspan="3">Totais</th>
+                                    <th id="repTotNormal">0:00</th>
+                                    <th id="repTotExtra">0:00</th>
+                                    <th id="repValNormal">¥ 0,00</th>
+                                    <th id="repValExtra">¥ 0,00</th>
+                                    <th id="repValTotal">¥ 0,00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settingsContent" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Configurações</h5>
+                </div>
+                <div class="card-body">
+                    <form id="settingsForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome da Empresa</label>
+                            <input type="text" class="form-control" id="companyName" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Data de Entrada</label>
+                            <input type="date" class="form-control" id="startDate" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Data de Saída</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Horário Entrada Padrão</label>
+                            <input type="time" class="form-control" id="workStart">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Horário Saída Padrão</label>
+                            <input type="time" class="form-control" id="workEnd">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Valor da Hora (¥)</label>
+                            <input type="number" step="0.01" class="form-control" id="hourRate" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Percentual Hora Extra (%)</label>
+                            <input type="number" step="0.01" class="form-control" id="extraPercent" value="25">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Minutos Almoço</label>
+                            <input type="number" class="form-control" id="lunchBreak" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Quantidade Intervalos</label>
+                            <input type="number" class="form-control" id="breakCount" value="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Minutos por Intervalo</label>
+                            <input type="number" class="form-control" id="breakMinutes" value="15">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Horas por Dia</label>
+                            <input type="number" class="form-control" id="workHoursPerDay" value="8" required>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary" id="saveSettingsBtn">Salvar
+                                Configurações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editRecordModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Registro</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editRecordForm">
+                            <input type="hidden" id="editRecordId">
+                            <div class="mb-3">
+                                <label class="form-label">Data</label>
+                                <input type="date" class="form-control" id="editDate" required>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Entrada</label>
+                                    <input type="time" class="form-control" id="editIn" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Saída</label>
+                                    <input type="time" class="form-control" id="editOut" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Observação</label>
+                                <textarea class="form-control" id="editNotes" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="saveEditRecordBtn">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variáveis globais
+        let currentTimeInterval;
+        let workTimeInterval;
+        let currentRecord = null;
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Inicializar Supabase
+            if (!initSupabase()) {
+                return;
+            }
+
+            // Verificar autenticação
+            const isLoggedIn = await authManager.checkAuth();
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Inicializar interface
+            await initializeInterface();
+            await verifySupabaseConnection();
+
+            // Carregar dados iniciais
+            await loadDashboardData();
+
+            // Iniciar relógio
+            startClock();
+
+            // Event listeners
+            setupEventListeners();
+        });
+
+        // Inicializar interface
+        async function initializeInterface() {
+            const current = authManager.getCurrentUser();
+            let name = 'Usuário';
+            if (current?.profile?.full_name) {
+                name = current.profile.full_name;
+            } else {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    name = session.user.user_metadata?.full_name || session.user.email || name;
+                }
+            }
+            document.getElementById('userName').textContent = name;
+        }
+
+        async function verifySupabaseConnection() {
+            try {
+                const reachable = await checkSupabaseReachability();
+                if (!reachable) {
+                    showAlert('Falha ao conectar ao Supabase (rede/DNS)', 'danger');
+                    return false;
+                }
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session || !session.user) {
+                    showAlert('Sessão não encontrada. Faça login novamente.', 'warning');
+                    return false;
+                }
+                const { error } = await supabase
+                    .from('work_settings')
+                    .select('user_id', { count: 'exact', head: true })
+                    .eq('user_id', session.user.id);
+                if (error) {
+                    showAlert('Conexão ao banco ativa, mas acesso negado (RLS/política): ' + (error.message || error), 'warning');
+                    return false;
+                }
+                const trTest = await supabase
+                    .from('time_records')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', session.user.id);
+                if (trTest.error) {
+                    const msg = trTest.error.message || trTest.error;
+                    if (msg.includes('relation') && msg.includes('does not exist')) {
+                        showAlert('Tabela time_records inexistente. Crie o schema no Supabase.', 'warning');
+                    } else {
+                        showAlert('Acesso a time_records negado (RLS/política): ' + msg, 'warning');
+                    }
+                    return false;
+                }
+                showAlert('Conexão com Supabase ativa', 'success');
+                return true;
+            } catch (err) {
+                showAlert('Erro ao verificar conexão: ' + (err.message || err), 'danger');
+                return false;
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Navegação
+            document.getElementById('dashboardTab').addEventListener('click', () => showTab('dashboard'));
+            document.getElementById('timecardTab').addEventListener('click', () => showTab('timecard'));
+            document.getElementById('reportsTab').addEventListener('click', () => showTab('reports'));
+            document.getElementById('settingsTab').addEventListener('click', () => showTab('settings'));
+
+            // Ponto
+            document.getElementById('clockInBtn').addEventListener('click', clockIn);
+            document.getElementById('clockOutBtn').addEventListener('click', openClockOutModal);
+
+            // Outros
+            document.getElementById('refreshRecords').addEventListener('click', loadRecentRecords);
+            document.getElementById('logoutLink').addEventListener('click', logout);
+            document.getElementById('tcPreviewBtn').addEventListener('click', previewManualRecord);
+            document.getElementById('timecardForm').addEventListener('submit', saveManualRecord);
+            document.getElementById('profileLink').addEventListener('click', openProfileModal);
+        }
+
+        // Mostrar aba
+        function showTab(tabName) {
+            // Esconder todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // Remover classe active de todos os links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Mostrar aba selecionada
+            document.getElementById(tabName + 'Content').style.display = 'block';
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            if (tabName === 'dashboard') {
+                loadDashboardData();
+            }
+            if (tabName === 'settings') {
+                initSettings();
+            }
+            if (tabName === 'timecard') {
+                initTimecard();
+            }
+            if (tabName === 'reports') {
+                initReports();
+            }
+        }
+
+        // Iniciar relógio
+        function startClock() {
+            currentTimeInterval = setInterval(() => {
+                const now = new Date();
+                document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR');
+            }, 1000);
+        }
+
+        async function openProfileModal() {
+            try {
+                const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+                const current = authManager.getCurrentUser();
+                const email = current?.user?.email || '';
+                const profile = current?.profile || {};
+                document.getElementById('pfEmail').value = email;
+                document.getElementById('pfFullName').value = profile.full_name || '';
+                document.getElementById('pfCompanyName').value = profile.company_name || '';
+                document.getElementById('pfNewPassword').value = '';
+                document.getElementById('pfConfirmPassword').value = '';
+                modal.show();
+                document.getElementById('saveProfileBtn').onclick = async () => {
+                    try {
+                        const newEmail = document.getElementById('pfEmail').value.trim();
+                        const newPassword = document.getElementById('pfNewPassword').value;
+                        const confirmPassword = document.getElementById('pfConfirmPassword').value;
+                        let changed = false;
+                        if (newEmail && newEmail !== email) {
+                            const r1 = await authManager.updateEmail(newEmail);
+                            if (r1.success) {
+                                showAlert('Email atualizado. Verifique sua caixa de entrada para confirmar.', 'success');
+                                changed = true;
+                            } else {
+                                showAlert(r1.error || 'Erro ao atualizar email', 'danger');
+                            }
+                        }
+                        if (newPassword || confirmPassword) {
+                            if (newPassword !== confirmPassword) {
+                                showAlert('As senhas não coincidem', 'danger');
+                            } else if ((newPassword || '').length < 6) {
+                                showAlert('A senha deve ter pelo menos 6 caracteres', 'danger');
+                            } else {
+                                const r2 = await authManager.updatePassword(newPassword);
+                                if (r2.success) {
+                                    showAlert('Senha atualizada com sucesso', 'success');
+                                    changed = true;
+                                } else {
+                                    showAlert(r2.error || 'Erro ao atualizar senha', 'danger');
+                                }
+                            }
+                        }
+                        if (changed) {
+                            bootstrap.Modal.getInstance(document.getElementById('profileModal')).hide();
+                        }
+                    } catch (e) {
+                        showAlert('Erro ao salvar perfil', 'danger');
+                    }
+                };
+            } catch (e) {
+                showAlert('Erro ao abrir perfil', 'danger');
+            }
+        }
+
+        // Carregar dados do dashboard
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadCurrentStatus(),
+                    loadStatistics(),
+                    loadRecentRecords()
+                ]);
+            } catch (error) {
+                console.error('Erro ao carregar dados do dashboard:', error);
+                showAlert('Erro ao carregar dados do dashboard', 'danger');
+            }
+        }
+
+        async function initSettings() {
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+                const ws = timecardManager.workSettings || {};
+                document.getElementById('companyName').value = ws.company_name || '';
+                document.getElementById('startDate').value = ws.start_date || '';
+                document.getElementById('endDate').value = ws.end_date || '';
+                document.getElementById('hourRate').value = ws.hourly_rate || 0;
+                document.getElementById('extraPercent').value = ws.overtime_rate || 25;
+                document.getElementById('lunchBreak').value = ws.lunch_minutes || 60;
+                document.getElementById('breakCount').value = ws.break_count || 0;
+                document.getElementById('breakMinutes').value = ws.break_minutes || 15;
+                document.getElementById('workHoursPerDay').value = ws.daily_hours || 8;
+                document.getElementById('workStart').value = ws.work_start || '';
+                document.getElementById('workEnd').value = ws.work_end || '';
+            } catch (e) {
+                showAlert('Erro ao carregar configurações', 'danger');
+            }
+
+            const form = document.getElementById('settingsForm');
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    const timecardManager = new TimecardManager();
+                    await timecardManager.loadWorkSettings();
+                    const payload = {
+                        company_name: document.getElementById('companyName').value,
+                        start_date: document.getElementById('startDate').value || null,
+                        end_date: document.getElementById('endDate').value || null,
+                        hourly_rate: parseFloat(document.getElementById('hourRate').value || '0'),
+                        overtime_rate: parseFloat(document.getElementById('extraPercent').value || '0'),
+                        lunch_minutes: parseInt(document.getElementById('lunchBreak').value || '0'),
+                        break_count: parseInt(document.getElementById('breakCount').value || '0'),
+                        break_minutes: parseInt(document.getElementById('breakMinutes').value || '0'),
+                        daily_hours: parseInt(document.getElementById('workHoursPerDay').value || '8'),
+                        work_start: document.getElementById('workStart').value || null,
+                        work_end: document.getElementById('workEnd').value || null
+                    };
+                    const res = await timecardManager.saveWorkSettings(payload);
+                    if (res.success) {
+                        showAlert('Configurações salvas com sucesso', 'success');
+                    } else {
+                        showAlert(res.message || 'Não foi possível salvar as configurações', 'danger');
+                    }
+                } catch (err) {
+                    showAlert('Erro ao salvar configurações', 'danger');
+                }
+            };
+        }
+
+        function initTimecard() {
+            const d = new Date();
+            const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+            document.getElementById('tcDate').value = iso;
+            document.getElementById('tcSunday').checked = new Date(iso).getDay() === 0;
+            document.getElementById('tcIn').value = '';
+            document.getElementById('tcOut').value = '';
+            document.getElementById('tcNotes').value = '';
+            const box = document.getElementById('tcPreview');
+            box.style.display = 'none';
+            box.innerHTML = '';
+        }
+
+        function initReports() {
+            const months = {
+                '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril', '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+            };
+            const repMonth = document.getElementById('repMonth');
+            repMonth.innerHTML = '';
+            Object.keys(months).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m; opt.textContent = months[m]; repMonth.appendChild(opt);
+            });
+            const repYear = document.getElementById('repYear');
+            const yearNow = new Date().getFullYear();
+            repYear.innerHTML = '';
+            for (let y = yearNow; y >= yearNow - 5; y--) {
+                const opt = document.createElement('option'); opt.value = y; opt.textContent = y; repYear.appendChild(opt);
+            }
+            document.getElementById('repFilterBtn').onclick = loadMonthlyReport;
+            document.getElementById('repPrintBtn').onclick = () => window.print();
+            repMonth.value = new Date().toISOString().slice(5, 7);
+            repYear.value = yearNow.toString();
+            loadMonthlyReport();
+        }
+
+        async function previewManualRecord() {
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+                const input = {
+                    date: document.getElementById('tcDate').value,
+                    clock_in: document.getElementById('tcIn').value,
+                    clock_out: document.getElementById('tcOut').value,
+                    is_sunday: document.getElementById('tcSunday').checked,
+                    is_holiday: false,
+                    notes: document.getElementById('tcNotes').value
+                };
+                const calc = timecardManager.calculateRecord(input);
+                const fmt = (h) => timecardManager.formatHours(h);
+                const extraRate = (timecardManager.workSettings?.hourly_rate || 0) * (1 + (parseFloat(timecardManager.workSettings?.overtime_rate || 0) / 100));
+                const html = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Horas normais:</strong> ${fmt(calc.normalHours)} (¥ ${calc.normalValue.toFixed(2)})</p>
+                            <p><strong>Horas extras:</strong> ${fmt(calc.extraHours)} (¥ ${calc.extraValue.toFixed(2)})</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Total considerado:</strong> ${fmt(calc.totalHours)}</p>
+                            <p><strong>Valor hora extra:</strong> ¥ ${extraRate.toFixed(2)}/h</p>
+                        </div>
+                    </div>`;
+                const box = document.getElementById('tcPreview');
+                box.innerHTML = html;
+                box.style.display = 'block';
+            } catch (e) {
+                showAlert('Erro ao calcular prévia', 'danger');
+            }
+        }
+
+        async function saveManualRecord(e) {
+            e.preventDefault();
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+                const isSunday = new Date(document.getElementById('tcDate').value).getDay() === 0;
+                const isChecked = document.getElementById('tcSunday').checked;
+                let notes = document.getElementById('tcNotes').value;
+
+                // Se marcado e não for domingo, é feriado
+                if (isChecked && !isSunday) {
+                    notes = notes ? notes + ' - Feriado' : 'Feriado';
+                }
+
+                const input = {
+                    date: document.getElementById('tcDate').value,
+                    clock_in: document.getElementById('tcIn').value,
+                    clock_out: document.getElementById('tcOut').value,
+                    is_sunday: isChecked, // Mantém lógica de cálculo
+                    is_holiday: isChecked && !isSunday,
+                    notes: notes
+                };
+                const res = await timecardManager.saveManualRecord(input);
+                if (res.success) {
+                    showAlert('Registro salvo com sucesso', 'success');
+                    loadRecentRecords();
+                } else {
+                    showAlert(res.message || 'Erro ao salvar registro', 'danger');
+                }
+            } catch (err) {
+                showAlert('Erro ao salvar registro', 'danger');
+            }
+        }
+
+        function openClockOutModal() {
+            const modalEl = document.getElementById('clockOutModal');
+            const modal = new bootstrap.Modal(modalEl);
+            document.getElementById('clockOutNotes').value = '';
+            modal.show();
+            document.getElementById('confirmClockOutBtn').onclick = async () => {
+                try {
+                    const note = document.getElementById('clockOutNotes').value || null;
+                    const timecardManager = new TimecardManager();
+                    await timecardManager.loadWorkSettings();
+                    const result = await timecardManager.clockOut(note);
+                    if (result.success) {
+                        showAlert('Saída registrada com sucesso!', 'success');
+                        updateWorkStatus(false);
+                        loadStatistics();
+                        loadRecentRecords();
+                        bootstrap.Modal.getInstance(modalEl).hide();
+                    } else {
+                        showAlert(result.message || 'Erro ao registrar saída', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Erro ao registrar saída', 'danger');
+                }
+            };
+        }
+
+        async function loadMonthlyReport() {
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+                const month = document.getElementById('repMonth').value;
+                const year = document.getElementById('repYear').value;
+                const start = `${year}-${month}-01`;
+                const endDate = new Date(`${year}-${month}-01`);
+                endDate.setMonth(endDate.getMonth() + 1);
+                endDate.setDate(0);
+                const end = endDate.toISOString().split('T')[0];
+                const records = await timecardManager.getRecords(start, end);
+                const tbody = document.getElementById('repBody');
+                tbody.innerHTML = '';
+                let totNorm = 0, totExt = 0, valNorm = 0, valExt = 0;
+                records.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(r => {
+                    const isSunday = new Date(r.date).getDay() === 0;
+                    const calc = timecardManager.calculateRecord({
+                        date: r.date,
+                        clock_in: r.clock_in || '00:00',
+                        clock_out: r.clock_out || '00:00',
+                        is_sunday: isSunday,
+                        is_holiday: false,
+                        notes: ''
+                    });
+                    totNorm += calc.normalHours;
+                    totExt += calc.extraHours;
+                    valNorm += calc.normalValue;
+                    valExt += calc.extraValue;
+                    const totalDia = calc.normalValue + calc.extraValue;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${new Date(r.date).toLocaleDateString('pt-BR')}</td>
+                        <td>${r.clock_in || '--:--'}</td>
+                        <td>${r.clock_out || '--:--'}</td>
+                        <td>${timecardManager.formatHours(calc.normalHours)}</td>
+                        <td>${timecardManager.formatHours(calc.extraHours)}</td>
+                        <td>¥ ${valToStr(calc.normalValue)}</td>
+                        <td>¥ ${valToStr(calc.extraValue)}</td>
+                        <td>¥ ${valToStr(totalDia)}</td>
+                        <td>${isSunday ? '<span class="badge bg-info">Domingo</span> ' : ''}${new Date(r.date).getDay() === 6 ? '<span class="badge bg-warning text-dark">Sábado</span> ' : ''}${r.notes ?? r.observacao ?? r.observacoes ?? ''}</td>`;
+                    tbody.appendChild(tr);
+                });
+                document.getElementById('repTotNormal').textContent = timecardManager.formatHours(totNorm);
+                document.getElementById('repTotExtra').textContent = timecardManager.formatHours(totExt);
+                document.getElementById('repValNormal').textContent = `¥ ${valToStr(valNorm)}`;
+                document.getElementById('repValExtra').textContent = `¥ ${valToStr(valExt)}`;
+                document.getElementById('repValTotal').textContent = `¥ ${valToStr(valNorm + valExt)}`;
+            } catch (e) {
+                showAlert('Erro ao carregar relatório', 'danger');
+            }
+        }
+
+        function valToStr(v) {
+            return (v || 0).toFixed(2).replace('.', ',');
+        }
+
+
+
+        async function openEditRecord(id) {
+            try {
+                const timecardManager = new TimecardManager();
+                const rec = await timecardManager.getRecordById(id);
+                document.getElementById('editRecordId').value = rec.id;
+                document.getElementById('editDate').value = rec.date;
+                document.getElementById('editIn').value = (rec.clock_in || '00:00').substring(0, 5);
+                document.getElementById('editOut').value = (rec.clock_out || '00:00').substring(0, 5);
+                document.getElementById('editNotes').value = rec.notes || '';
+                const modal = new bootstrap.Modal(document.getElementById('editRecordModal'));
+                modal.show();
+                document.getElementById('saveEditRecordBtn').onclick = async () => {
+                    const updates = {
+                        date: document.getElementById('editDate').value,
+                        clock_in: document.getElementById('editIn').value,
+                        clock_out: document.getElementById('editOut').value,
+                        notes: document.getElementById('editNotes').value
+                    };
+                    const res = await timecardManager.updateRecord(id, updates);
+                    if (res.success) {
+                        showAlert('Registro atualizado com sucesso', 'success');
+                        loadRecentRecords();
+                        bootstrap.Modal.getInstance(document.getElementById('editRecordModal')).hide();
+                    } else {
+                        showAlert(res.message || 'Erro ao atualizar registro', 'danger');
+                    }
+                };
+            } catch (e) {
+                showAlert('Erro ao carregar registro: ' + (e.message || e), 'danger');
+            }
+        }
+
+        // Carregar status atual
+        async function loadCurrentStatus() {
+            try {
+                // Inicializar o gerenciador de ponto
+                const timecardManager = new TimecardManager();
+
+                // Carregar configurações de trabalho
+                await timecardManager.loadWorkSettings();
+
+                // Verificar se há registro em aberto
+                const currentRecord = await timecardManager.checkCurrentRecord();
+
+                if (currentRecord && currentRecord.clock_in && !currentRecord.clock_out) {
+                    // Há um ponto aberto
+                    updateWorkStatus(true, currentRecord.clock_in);
+                } else {
+                    // Não há ponto aberto
+                    updateWorkStatus(false);
+                }
+
+                return currentRecord;
+            } catch (error) {
+                console.error('Erro ao carregar status atual:', error);
+                showAlert('Erro ao verificar status do ponto: ' + (error?.message || error), 'danger');
+                updateWorkStatus(false);
+                return null;
+            }
+        }
+
+        // Carregar estatísticas
+        async function loadStatistics() {
+            try {
+                const timecardManager = new TimecardManager();
+
+                // Carregar estatísticas do dia, semana e mês
+                const today = new Date().toISOString().split('T')[0];
+
+                // Calcular início da semana (domingo)
+                const weekStart = new Date();
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                const weekStartStr = weekStart.toISOString().split('T')[0];
+
+                // Calcular início do mês
+                const monthStart = new Date();
+                monthStart.setDate(1);
+                const monthStartStr = monthStart.toISOString().split('T')[0];
+
+                // Buscar registros
+                const [todayStats, weekStats, monthStats] = await Promise.all([
+                    timecardManager.getStatistics(today, today),
+                    timecardManager.getStatistics(weekStartStr, today),
+                    timecardManager.getStatistics(monthStartStr, today)
+                ]);
+
+                // Atualizar interface
+                document.getElementById('todayHours').textContent = timecardManager.formatHours(todayStats.totalHours);
+                document.getElementById('weekHours').textContent = timecardManager.formatHours(weekStats.totalHours);
+                document.getElementById('monthHours').textContent = timecardManager.formatHours(monthStats.totalHours);
+                document.getElementById('extraHours').textContent = timecardManager.formatHours(monthStats.overtimeHours);
+
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                document.getElementById('todayHours').textContent = '0:00';
+                document.getElementById('weekHours').textContent = '0:00';
+                document.getElementById('monthHours').textContent = '0:00';
+                document.getElementById('extraHours').textContent = '0:00';
+            }
+        }
+
+        // Carregar registros recentes
+        async function loadRecentRecords() {
+            const tbody = document.getElementById('recentRecords');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted"><i class="bi bi-hourglass-split"></i> Carregando registros...</td></tr>';
+
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+
+                // Buscar registros dos últimos 7 dias
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 7);
+                const startDateStr = startDate.toISOString().split('T')[0];
+
+                const records = await timecardManager.getRecords(startDateStr, endDate);
+
+                if (records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Nenhum registro encontrado</td></tr>';
+                    return;
+                }
+
+                // Limpar tabela
+                tbody.innerHTML = '';
+
+                // Adicionar registros à tabela
+                records.forEach(record => {
+                    const row = document.createElement('tr');
+
+                    // Formatar data
+                    const date = new Date(record.date);
+                    const formattedDate = date.toLocaleDateString('pt-BR');
+
+                    // Calcular horas trabalhadas
+                    const totalHours = record.total_hours || 0;
+                    const formattedHours = timecardManager.formatHours(totalHours);
+
+                    // Definir classe de status
+                    let statusClass = 'badge bg-secondary';
+                    let statusText = 'Pendente';
+
+                    if (record.status === 'working') {
+                        statusClass = 'badge bg-success';
+                        statusText = 'Trabalhando';
+                    } else if (record.status === 'completed') {
+                        statusClass = 'badge bg-primary';
+                        statusText = 'Concluído';
+                    }
+                    const isSunday = new Date(record.date).getDay() === 0;
+
+                    row.innerHTML = `
+                        <td>${formattedDate}</td>
+                        <td>${record.clock_in || '--:--'}</td>
+                        <td>${record.clock_out || '--:--'}</td>
+                        <td>${formattedHours}</td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
+                        <td>${isSunday ? '<span class="badge bg-info me-1">Domingo</span>' : ''}${new Date(record.date).getDay() === 6 ? '<span class="badge bg-warning text-dark me-1">Sábado</span>' : ''}${record.notes ?? record.observacao ?? record.observacoes ?? ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-record" data-id="${record.id}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-record" data-id="${record.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+
+                // Adicionar event listeners para botões de edição
+                document.querySelectorAll('.edit-record').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const recordId = e.currentTarget.getAttribute('data-id');
+                        openEditRecord(recordId);
+                    });
+                });
+                document.querySelectorAll('.delete-record').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const recordId = e.currentTarget.getAttribute('data-id');
+                        if (confirm('Deseja excluir este registro?')) {
+                            const timecardManager = new TimecardManager();
+                            const res = await timecardManager.deleteRecord(recordId);
+                            if (res.success) {
+                                showAlert('Registro excluído', 'success');
+                                loadRecentRecords();
+                            } else {
+                                showAlert(res.message || 'Erro ao excluir', 'danger');
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar registros:', error);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro ao carregar registros</td></tr>';
+            }
+        }
+
+        // Atualizar status de trabalho
+        function updateWorkStatus(isWorking, startTime = null) {
+            const statusElement = document.getElementById('workStatus');
+            const timeElement = document.getElementById('workTime');
+            const clockInBtn = document.getElementById('clockInBtn');
+            const clockOutBtn = document.getElementById('clockOutBtn');
+
+            if (isWorking) {
+                statusElement.textContent = 'Trabalhando';
+                statusElement.className = 'h4 text-success';
+                clockInBtn.disabled = true;
+                clockOutBtn.disabled = false;
+
+                // Iniciar contador de tempo
+                if (startTime && workTimeInterval) {
+                    clearInterval(workTimeInterval);
+                }
+
+                workTimeInterval = setInterval(() => {
+                    if (startTime) {
+                        const now = new Date();
+                        const diff = now - new Date(startTime);
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        timeElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                    }
+                }, 1000);
+            } else {
+                statusElement.textContent = 'Fora do Expediente';
+                statusElement.className = 'h4 text-secondary';
+                timeElement.textContent = '--:--';
+                clockInBtn.disabled = false;
+                clockOutBtn.disabled = true;
+
+                if (workTimeInterval) {
+                    clearInterval(workTimeInterval);
+                }
+            }
+        }
+
+        // Registrar entrada
+        async function clockIn() {
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+
+                // Registrar entrada
+                const result = await timecardManager.clockIn();
+
+                if (result.success) {
+                    showAlert('Entrada registrada com sucesso!', 'success');
+                    updateWorkStatus(true, new Date().toLocaleTimeString());
+
+                    // Recarregar dados
+                    loadStatistics();
+                    loadRecentRecords();
+                } else {
+                    showAlert(result.message || 'Erro ao registrar entrada', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao registrar entrada:', error);
+                showAlert('Erro ao registrar entrada', 'danger');
+            }
+        }
+
+        // Registrar saída
+        async function clockOut() {
+            try {
+                const timecardManager = new TimecardManager();
+                await timecardManager.loadWorkSettings();
+
+                // Registrar saída
+                const result = await timecardManager.clockOut();
+
+                if (result.success) {
+                    showAlert('Saída registrada com sucesso!', 'success');
+                    updateWorkStatus(false);
+
+                    // Recarregar dados
+                    loadStatistics();
+                    loadRecentRecords();
+                } else {
+                    showAlert(result.message || 'Erro ao registrar saída', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao registrar saída:', error);
+                showAlert('Erro ao registrar saída', 'danger');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            const result = await authManager.logout();
+            if (result.success) {
+                window.location.href = 'login.html';
+            } else {
+                showAlert('Erro ao fazer logout: ' + result.error, 'danger');
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.getElementById('alertContainer').appendChild(alertDiv);
+
+            // Auto-remover após 5 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

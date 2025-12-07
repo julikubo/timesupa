@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestão de Usuários</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-action:hover {
+            background: #0056b3;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Gestão de Usuários</h1>
+            <a href="index.html" class="btn-action" style="text-decoration: none; background: #6c757d;">Voltar</a>
+        </div>
+
+        <div id="errorMsg" style="color: red; display: none; margin: 10px 0;"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>ID</th>
+                    <th>Criado em</th>
+                    <th>Último Login</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="userList">
+                <tr>
+                    <td colspan="5">Carregando...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            const list = document.getElementById('userList');
+            try {
+                const response = await fetch('facelogin/api/admin.php?action=list_users');
+                const data = await response.json();
+
+                if (data.success) {
+                    list.innerHTML = '';
+                    data.users.forEach(user => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${user.email}</td>
+                            <td><small>${user.id}</small></td>
+                            <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                            <td>${user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'Nunca'}</td>
+                            <td>
+                                <button class="btn-action" onclick="changePassword('${user.id}', '${user.email}')">Alterar Senha</button>
+                            </td>
+                        `;
+                        list.appendChild(tr);
+                    });
+                } else {
+                    list.innerHTML = `<tr><td colspan="5" style="color:red">Erro: ${data.error}</td></tr>`;
+                    if (data.error.includes('Service Role Key')) {
+                        document.getElementById('errorMsg').style.display = 'block';
+                        document.getElementById('errorMsg').innerText = 'Backend não configurado. Adicione a Service Key em supabase_secrets.php';
+                    }
+                }
+            } catch (e) {
+                list.innerHTML = `<tr><td colspan="5">Erro de conexão</td></tr>`;
+            }
+        }
+
+        async function changePassword(id, email) {
+            const newPass = prompt(`Digite a nova senha para ${email}:`);
+            if (!newPass) return;
+
+            try {
+                const response = await fetch('facelogin/api/admin.php?action=update_password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: id, password: newPass })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Senha alterada com sucesso!');
+                } else {
+                    alert('Erro: ' + data.error);
+                }
+            } catch (e) {
+                alert('Erro ao alterar senha');
+            }
+        }
+
+        loadUsers();
+    </script>
+</body>
+
+</html>
